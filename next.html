@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Table with Pagination</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .table-container {
+            width: 60%;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            margin: 0 5px;
+            font-size: 1em;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .pagination .page-number {
+            background-color: black;
+            color: white;
+        }
+
+        .pagination .page-number.active {
+            background-color: #333;
+        }
+
+        .pagination .next-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .pagination button.disabled {
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="table-container">
+    <h2>Inventory Table</h2>
+    <table id="inventoryTable">
+        <thead>
+            <tr>
+                <th>Item ID</th>
+                <th>Item Name</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Table rows will be populated by JavaScript -->
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <!-- Page numbers will be generated here -->
+    </div>
+</div>
+
+<script>
+    const inventoryItems = Array.from({ length: 50 }, (_, i) => ({
+        id: `ID-${i + 1}`,
+        name: `Item ${i + 1}`,
+        quantity: Math.floor(Math.random() * 100) + 1
+    }));
+
+    const itemsPerPage = 10;
+    let currentPage = 1;
+
+    function displayTable(page) {
+        const tableBody = document.getElementById('inventoryTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';
+
+        // Calculate start and end indices for the current page
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const pageItems = inventoryItems.slice(start, end);
+
+        // Populate table rows
+        pageItems.forEach(item => {
+            const row = tableBody.insertRow();
+            row.insertCell(0).innerText = item.id;
+            row.insertCell(1).innerText = item.name;
+            row.insertCell(2).innerText = item.quantity;
+        });
+
+        // Update pagination
+        updatePagination();
+    }
+
+    function updatePagination() {
+        const paginationDiv = document.querySelector('.pagination');
+        paginationDiv.innerHTML = '';
+
+        const totalPages = Math.ceil(inventoryItems.length / itemsPerPage);
+
+        // Generate page number buttons
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.innerText = i;
+            pageButton.classList.add('page-number');
+            if (i === currentPage) {
+                pageButton.classList.add('active');
+            }
+            pageButton.addEventListener('click', () => {
+                currentPage = i;
+                displayTable(currentPage);
+            });
+            paginationDiv.appendChild(pageButton);
+        }
+
+        // Generate "Next" button
+        const nextButton = document.createElement('button');
+        nextButton.innerText = 'Next';
+        nextButton.classList.add('next-button');
+        nextButton.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayTable(currentPage);
+            }
+        });
+        if (currentPage === totalPages) {
+            nextButton.classList.add('disabled');
+            nextButton.disabled = true;
+        }
+        paginationDiv.appendChild(nextButton);
+    }
+
+    // Initial table display
+    displayTable(currentPage);
+</script>
+
+</body>
+</html>
